@@ -1,0 +1,1166 @@
+--=========================================================
+-- AXIOM BLOX FRUITS HUB - UI SHELL ONLY
+-- Không có chức năng farm / quest / combat / teleport
+--=========================================================
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+local oldGui = PlayerGui:FindFirstChild("AxiomBloxHub")
+if oldGui then
+    oldGui:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "AxiomBloxHub"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.IgnoreGuiInset = false
+ScreenGui.Parent = PlayerGui
+
+--=========================================================
+-- MAIN WINDOW
+--=========================================================
+
+local Main = Instance.new("Frame")
+Main.Name = "Main"
+Main.Size = UDim2.new(0, 560, 0, 360)
+Main.Position = UDim2.new(0.5, -280, 0.5, -180)
+Main.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+Main.BorderSizePixel = 0
+Main.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 12)
+MainCorner.Parent = Main
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(65, 65, 75)
+MainStroke.Thickness = 1
+MainStroke.Parent = Main
+
+--=========================================================
+-- TOP BAR
+--=========================================================
+
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 45)
+TopBar.BackgroundColor3 = Color3.fromRGB(26, 26, 31)
+TopBar.BorderSizePixel = 0
+TopBar.Parent = Main
+
+local TopCorner = Instance.new("UICorner")
+TopCorner.CornerRadius = UDim.new(0, 12)
+TopCorner.Parent = TopBar
+
+local TopFix = Instance.new("Frame")
+TopFix.Size = UDim2.new(1, 0, 0, 12)
+TopFix.Position = UDim2.new(0, 0, 1, -12)
+TopFix.BackgroundColor3 = TopBar.BackgroundColor3
+TopFix.BorderSizePixel = 0
+TopFix.Parent = TopBar
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -100, 1, 0)
+Title.Position = UDim2.new(0, 15, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "AXIOM | BLOX FRUITS"
+Title.TextColor3 = Color3.fromRGB(240, 240, 245)
+Title.TextSize = 18
+Title.Font = Enum.Font.GothamBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = TopBar
+
+--=========================================================
+-- MINIMIZE + CLOSE
+--=========================================================
+
+local Minimize = Instance.new("TextButton")
+Minimize.Size = UDim2.new(0, 35, 0, 30)
+Minimize.Position = UDim2.new(1, -78, 0, 7)
+Minimize.BackgroundColor3 = Color3.fromRGB(40, 40, 47)
+Minimize.Text = "—"
+Minimize.TextColor3 = Color3.fromRGB(230, 230, 235)
+Minimize.TextSize = 18
+Minimize.Font = Enum.Font.GothamBold
+Minimize.BorderSizePixel = 0
+Minimize.Parent = TopBar
+
+local MinCorner = Instance.new("UICorner")
+MinCorner.CornerRadius = UDim.new(0, 7)
+MinCorner.Parent = Minimize
+
+local Close = Instance.new("TextButton")
+Close.Size = UDim2.new(0, 35, 0, 30)
+Close.Position = UDim2.new(1, -40, 0, 7)
+Close.BackgroundColor3 = Color3.fromRGB(125, 45, 45)
+Close.Text = "X"
+Close.TextColor3 = Color3.fromRGB(255, 255, 255)
+Close.TextSize = 14
+Close.Font = Enum.Font.GothamBold
+Close.BorderSizePixel = 0
+Close.Parent = TopBar
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 7)
+CloseCorner.Parent = Close
+
+--=========================================================
+-- SIDEBAR + CONTENT
+--=========================================================
+
+local Sidebar = Instance.new("Frame")
+Sidebar.Size = UDim2.new(0, 150, 1, -45)
+Sidebar.Position = UDim2.new(0, 0, 0, 45)
+Sidebar.BackgroundColor3 = Color3.fromRGB(23, 23, 28)
+Sidebar.BorderSizePixel = 0
+Sidebar.Parent = Main
+
+local Content = Instance.new("Frame")
+Content.Size = UDim2.new(1, -150, 1, -45)
+Content.Position = UDim2.new(0, 150, 0, 45)
+Content.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+Content.BorderSizePixel = 0
+Content.Parent = Main
+
+local sideLayout = Instance.new("UIListLayout")
+sideLayout.Padding = UDim.new(0, 6)
+sideLayout.SortOrder = Enum.SortOrder.LayoutOrder
+sideLayout.Parent = Sidebar
+
+local sidePadding = Instance.new("UIPadding")
+sidePadding.PaddingTop = UDim.new(0, 10)
+sidePadding.PaddingLeft = UDim.new(0, 4)
+sidePadding.PaddingRight = UDim.new(0, 4)
+sidePadding.Parent = Sidebar
+
+--=========================================================
+-- EMPTY TAB SYSTEM
+-- Chỉ giữ giao diện, không có chức năng
+--=========================================================
+
+local tabs = {}
+local tabButtons = {}
+
+local function createTab(name)
+    local page = Instance.new("Frame")
+    page.Name = name .. "Page"
+    page.Size = UDim2.new(1, 0, 1, 0)
+    page.BackgroundTransparency = 1
+    page.Visible = false
+    page.Parent = Content
+
+    local emptyText = Instance.new("TextLabel")
+    emptyText.Size = UDim2.new(1, 0, 1, 0)
+    emptyText.BackgroundTransparency = 1
+    emptyText.Text = ""
+    emptyText.Parent = page
+
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, -16, 0, 38)
+    button.BackgroundColor3 = Color3.fromRGB(30, 30, 36)
+    button.Text = name
+    button.TextColor3 = Color3.fromRGB(205, 205, 215)
+    button.TextSize = 14
+    button.Font = Enum.Font.GothamMedium
+    button.BorderSizePixel = 0
+    button.Parent = Sidebar
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = button
+
+    tabs[name] = page
+    tabButtons[name] = button
+
+    return page
+end
+
+local function switchTab(tabName)
+    for name, page in pairs(tabs) do
+        page.Visible = (name == tabName)
+
+        if tabButtons[name] then
+            TweenService:Create(
+                tabButtons[name],
+                TweenInfo.new(0.15),
+                {
+                    BackgroundColor3 = name == tabName
+                        and Color3.fromRGB(52, 52, 63)
+                        or Color3.fromRGB(30, 30, 36)
+                }
+            ):Play()
+        end
+    end
+end
+
+local FarmPage = createTab("Farm")
+local QuestPage = createTab("Quest")
+local CombatPage = createTab("Combat")
+local TeleportPage = createTab("Teleport")
+local SettingsPage = createTab("Settings")
+
+for name, button in pairs(tabButtons) do
+    button.MouseButton1Click:Connect(function()
+        switchTab(name)
+    end)
+end
+
+switchTab("Farm")
+
+
+--=========================================================
+-- FARM V1.2: AUTO QUEST + FARM THEO LEVEL
+-- 1 toggle: tự nhận quest -> tìm đúng mob -> đứng trên đầu -> đánh
+--=========================================================
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local FarmState = {
+    Enabled = false,
+    Token = 0,
+
+    -- Cao hơn bản cũ để mob khó chạm tới.
+    HoverHeight = 35,
+
+    -- Lệch rất nhẹ để tránh chồng đúng tâm HumanoidRootPart.
+    BackOffset = 0.35,
+
+    UpdateDelay = 0.06,
+    AttackDelay = 0.08,
+    QuestRetryDelay = 1.15,
+    LastQuestAttempt = 0,
+}
+
+--=========================================================
+-- QUEST DATABASE
+-- {MinLv, MaxLv, MobName, QuestName, QuestIndex, QuestCFrame}
+--=========================================================
+
+local QUESTS = {
+    -- SEA 1
+    {1,    9,    "Bandit",                 "BanditQuest1",        1, CFrame.new(1059.37, 15.45, 1550.42)},
+    {10,   14,   "Monkey",                 "JungleQuest",         1, CFrame.new(-1601.66, 36.85, 153.39)},
+    {15,   29,   "Gorilla",                "JungleQuest",         2, CFrame.new(-1601.66, 36.85, 153.39)},
+    {30,   39,   "Pirate",                 "BuggyQuest1",         1, CFrame.new(-1140.18, 4.75, 3827.41)},
+    {40,   59,   "Brute",                  "BuggyQuest1",         2, CFrame.new(-1140.18, 4.75, 3827.41)},
+    {60,   74,   "Desert Bandit",          "DesertQuest",         1, CFrame.new(894.49, 5.14, 4392.43)},
+    {75,   89,   "Desert Officer",         "DesertQuest",         2, CFrame.new(894.49, 5.14, 4392.43)},
+    {90,   99,   "Snow Bandit",            "SnowQuest",           1, CFrame.new(1389.74, 88.15, -1298.91)},
+    {100,  119,  "Snowman",                "SnowQuest",           2, CFrame.new(1389.74, 88.15, -1298.91)},
+    {120,  149,  "Chief Petty Officer",     "MarineQuest2",        1, CFrame.new(-5039.59, 27.35, 4324.68)},
+    {150,  174,  "Sky Bandit",             "SkyQuest",            1, CFrame.new(-4839.53, 716.37, -2619.44)},
+    {175,  189,  "Dark Master",            "SkyQuest",            2, CFrame.new(-4839.53, 716.37, -2619.44)},
+    {190,  209,  "Prisoner",               "PrisonerQuest",       1, CFrame.new(5308.93, 1.66, 475.12)},
+    {210,  249,  "Dangerous Prisoner",     "PrisonerQuest",       2, CFrame.new(5308.93, 1.66, 475.12)},
+    {250,  274,  "Toga Warrior",           "ColosseumQuest",      1, CFrame.new(-1576.12, 7.39, -2983.31)},
+    {275,  299,  "Gladiator",              "ColosseumQuest",      2, CFrame.new(-1576.12, 7.39, -2983.31)},
+    {300,  324,  "Military Soldier",       "MagmaQuest",          1, CFrame.new(-5313.37, 10.95, 8515.29)},
+    {325,  374,  "Military Spy",           "MagmaQuest",          2, CFrame.new(-5313.37, 10.95, 8515.29)},
+    {375,  399,  "Fishman Warrior",        "FishmanQuest",        1, CFrame.new(61122.65, 18.50, 1569.40)},
+    {400,  449,  "Fishman Commando",       "FishmanQuest",        2, CFrame.new(61122.65, 18.50, 1569.40)},
+    {450,  474,  "God's Guard",            "SkyExp1Quest",        1, CFrame.new(-4721.89, 843.87, -1949.97)},
+    {475,  524,  "Shanda",                 "SkyExp1Quest",        2, CFrame.new(-7859.10, 5544.19, -381.48)},
+    {525,  549,  "Royal Squad",            "SkyExp2Quest",        1, CFrame.new(-7906.82, 5634.66, -1411.99)},
+    {550,  624,  "Royal Soldier",          "SkyExp2Quest",        2, CFrame.new(-7906.82, 5634.66, -1411.99)},
+    {625,  649,  "Galley Pirate",          "FountainQuest",       1, CFrame.new(5254.60, 38.50, 4049.70)},
+    {650,  699,  "Galley Captain",         "FountainQuest",       2, CFrame.new(5254.60, 38.50, 4049.70)},
+
+    -- SEA 2
+    {700,  724,  "Raider",                 "Area1Quest",          1, CFrame.new(-424.08, 73.01, 1836.92)},
+    {725,  774,  "Mercenary",              "Area1Quest",          2, CFrame.new(-424.08, 73.01, 1836.92)},
+    {775,  799,  "Swan Pirate",            "Area2Quest",          1, CFrame.new(632.70, 73.11, 918.67)},
+    {800,  874,  "Factory Staff",          "Area2Quest",          2, CFrame.new(632.70, 73.11, 918.67)},
+    {875,  899,  "Marine Lieutenant",      "MarineQuest3",        1, CFrame.new(-2440.80, 71.71, -3216.07)},
+    {900,  949,  "Marine Captain",         "MarineQuest3",        2, CFrame.new(-2440.80, 71.71, -3216.07)},
+    {950,  974,  "Zombie",                 "ZombieQuest",         1, CFrame.new(-5492.79, 48.52, -793.71)},
+    {975,  999,  "Vampire",                "ZombieQuest",         2, CFrame.new(-5492.79, 48.52, -793.71)},
+    {1000, 1049, "Snow Trooper",           "SnowMountainQuest",   1, CFrame.new(609.86, 400.12, -5372.26)},
+    {1050, 1099, "Winter Warrior",         "SnowMountainQuest",   2, CFrame.new(609.86, 400.12, -5372.26)},
+    {1100, 1124, "Lab Subordinate",        "IceSideQuest",        1, CFrame.new(-6064.07, 15.24, -4902.98)},
+    {1125, 1174, "Horned Warrior",         "IceSideQuest",        2, CFrame.new(-6064.07, 15.24, -4902.98)},
+    {1175, 1199, "Magma Ninja",            "FireSideQuest",       1, CFrame.new(-5428.03, 15.06, -5299.43)},
+    {1200, 1249, "Lava Pirate",            "FireSideQuest",       2, CFrame.new(-5428.03, 15.06, -5299.43)},
+    {1250, 1274, "Ship Deckhand",          "ShipQuest1",          1, CFrame.new(1037.80, 125.09, 32911.60)},
+    {1275, 1299, "Ship Engineer",          "ShipQuest1",          2, CFrame.new(1037.80, 125.09, 32911.60)},
+    {1300, 1324, "Ship Steward",           "ShipQuest2",          1, CFrame.new(968.81, 125.09, 33244.13)},
+    {1325, 1349, "Ship Officer",           "ShipQuest2",          2, CFrame.new(968.81, 125.09, 33244.13)},
+    {1350, 1374, "Arctic Warrior",         "FrostQuest",          1, CFrame.new(5667.66, 26.80, -6486.09)},
+    {1375, 1424, "Snow Lurker",            "FrostQuest",          2, CFrame.new(5667.66, 26.80, -6486.09)},
+    {1425, 1449, "Sea Soldier",            "ForgottenQuest",      1, CFrame.new(-3054.44, 235.54, -10142.82)},
+    {1450, 1499, "Water Fighter",          "ForgottenQuest",      2, CFrame.new(-3054.44, 235.54, -10142.82)},
+
+    -- SEA 3
+    {1500, 1524, "Pirate Millionaire",     "PiratePortQuest",     1, CFrame.new(-290.07, 42.90, 5581.59)},
+    {1525, 1574, "Pistol Billionaire",     "PiratePortQuest",     2, CFrame.new(-290.07, 42.90, 5581.59)},
+    {1575, 1599, "Dragon Crew Warrior",    "DragonCrewQuest",     1, CFrame.new(6737.78, 127.43, -713.23)},
+    {1600, 1624, "Dragon Crew Archer",     "DragonCrewQuest",     2, CFrame.new(6737.78, 127.43, -713.23)},
+    {1625, 1649, "Hydra Enforcer",         "VenomCrewQuest",      1, CFrame.new(5212.94, 1004.12, 755.67)},
+    {1650, 1699, "Venomous Assailant",     "VenomCrewQuest",      2, CFrame.new(5212.94, 1004.12, 755.67)},
+    {1700, 1724, "Marine Commodore",       "MarineTreeIsland",    1, CFrame.new(2484.07, 74.28, -6786.64)},
+    {1725, 1774, "Marine Rear Admiral",    "MarineTreeIsland",    2, CFrame.new(2484.07, 74.28, -6786.64)},
+    {1775, 1799, "Fishman Raider",         "DeepForestIsland3",   1, CFrame.new(-10581.66, 330.87, -8761.19)},
+    {1800, 1824, "Fishman Captain",        "DeepForestIsland3",   2, CFrame.new(-10581.66, 330.87, -8761.19)},
+    {1825, 1849, "Forest Pirate",          "DeepForestIsland",    1, CFrame.new(-13234.04, 331.49, -7625.40)},
+    {1850, 1899, "Mythological Pirate",    "DeepForestIsland",    2, CFrame.new(-13234.04, 331.49, -7625.40)},
+    {1900, 1924, "Jungle Pirate",          "DeepForestIsland2",   1, CFrame.new(-12680.38, 389.97, -9902.02)},
+    {1925, 1974, "Musketeer Pirate",       "DeepForestIsland2",   2, CFrame.new(-12680.38, 389.97, -9902.02)},
+    {1975, 1999, "Reborn Skeleton",        "HauntedQuest1",       1, CFrame.new(-9479.22, 141.22, 5566.09)},
+    {2000, 2024, "Living Zombie",          "HauntedQuest1",       2, CFrame.new(-9479.22, 141.22, 5566.09)},
+    {2025, 2049, "Demonic Soul",           "HauntedQuest2",       1, CFrame.new(-9516.99, 172.02, 6078.47)},
+    {2050, 2074, "Posessed Mummy",         "HauntedQuest2",       2, CFrame.new(-9516.99, 172.02, 6078.47)},
+    {2075, 2099, "Peanut Scout",           "NutsIslandQuest",     1, CFrame.new(-2104.36, 38.13, -10194.07)},
+    {2100, 2124, "Peanut President",       "NutsIslandQuest",     2, CFrame.new(-2104.36, 38.13, -10194.07)},
+    {2125, 2149, "Ice Cream Chef",         "IceCreamIslandQuest", 1, CFrame.new(-820.22, 65.85, -10966.17)},
+    {2150, 2199, "Ice Cream Commander",    "IceCreamIslandQuest", 2, CFrame.new(-820.22, 65.85, -10966.17)},
+    {2200, 2224, "Cookie Crafter",         "CakeQuest1",          1, CFrame.new(-2021.32, 37.80, -12028.73)},
+    {2225, 2249, "Cake Guard",             "CakeQuest1",          2, CFrame.new(-2021.32, 37.80, -12028.73)},
+    {2250, 2274, "Baking Staff",           "CakeQuest2",          1, CFrame.new(-1927.92, 37.80, -12842.54)},
+    {2275, 2299, "Head Baker",             "CakeQuest2",          2, CFrame.new(-1927.92, 37.80, -12842.54)},
+    {2300, 2324, "Cocoa Warrior",          "ChocQuest1",          1, CFrame.new(233.23, 29.88, -12201.23)},
+    {2325, 2349, "Chocolate Bar Battler",  "ChocQuest1",          2, CFrame.new(233.23, 29.88, -12201.23)},
+    {2350, 2374, "Sweet Thief",            "ChocQuest2",          1, CFrame.new(150.51, 30.69, -12774.50)},
+    {2375, 2399, "Candy Rebel",            "ChocQuest2",          2, CFrame.new(150.51, 30.69, -12774.50)},
+    {2400, 2424, "Candy Pirate",           "CandyQuest1",         1, CFrame.new(-1150.04, 20.38, -14446.33)},
+    {2425, 2449, "Snow Demon",             "CandyQuest1",         2, CFrame.new(-1150.04, 20.38, -14446.33)},
+    {2450, 2474, "Isle Outlaw",            "TikiQuest1",          1, CFrame.new(-16547.75, 61.14, -173.41)},
+    {2475, 2499, "Island Boy",             "TikiQuest1",          2, CFrame.new(-16547.75, 61.14, -173.41)},
+    {2500, 2524, "Sun-kissed Warrior",     "TikiQuest2",          1, CFrame.new(-16539.08, 55.69, 1051.57)},
+    {2525, 2549, "Isle Champion",          "TikiQuest2",          2, CFrame.new(-16539.08, 55.69, 1051.57)},
+    {2550, 2574, "Serpent Hunter",         "TikiQuest3",          1, CFrame.new(-16668.03, 105.32, 1568.60)},
+    {2575, 2599, "Skull Slayer",           "TikiQuest3",          2, CFrame.new(-16668.03, 105.32, 1568.60)},
+
+    -- SUBMERGED ISLAND
+    {2600, 2624, "Reef Bandit",            "SubmergedQuest1",     1, CFrame.new(10882.26, -2086.32, 10034.23)},
+    {2625, 2649, "Coral Pirate",           "SubmergedQuest1",     2, CFrame.new(10882.26, -2086.32, 10034.23)},
+    {2650, 2674, "Sea Chanter",            "SubmergedQuest2",     1, CFrame.new(10882.26, -2086.32, 10034.23)},
+    {2675, 2699, "Ocean Prophet",          "SubmergedQuest2",     2, CFrame.new(10882.26, -2086.32, 10034.23)},
+    {2700, 2724, "High Disciple",          "SubmergedQuest3",     1, CFrame.new(9636.52, -1992.20, 9609.53)},
+    {2725, 2800, "Grand Devotee",          "SubmergedQuest3",     2, CFrame.new(9636.52, -1992.20, 9609.53)},
+}
+
+local function getCharacter()
+    local character = Player.Character
+    if not character or not character.Parent then
+        return nil
+    end
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    local root = character:FindFirstChild("HumanoidRootPart")
+
+    if not humanoid or humanoid.Health <= 0 or not root then
+        return nil
+    end
+
+    return character, humanoid, root
+end
+
+local function getPlayerLevel()
+    local data = Player:FindFirstChild("Data")
+    local level = data and data:FindFirstChild("Level")
+
+    if level and tonumber(level.Value) then
+        return tonumber(level.Value)
+    end
+
+    return 1
+end
+
+local function resolveQuest(level)
+    for _, q in ipairs(QUESTS) do
+        if level >= q[1] and level <= q[2] then
+            return {
+                Min = q[1],
+                Max = q[2],
+                Mob = q[3],
+                Quest = q[4],
+                Index = q[5],
+                CFrame = q[6],
+            }
+        end
+    end
+
+    return nil
+end
+
+local function getCommRemote()
+    local remotes = ReplicatedStorage:FindFirstChild("Remotes")
+    if not remotes then
+        return nil
+    end
+
+    return remotes:FindFirstChild("CommF_")
+        or remotes:FindFirstChild("CommF")
+end
+
+local function getQuestGui()
+    local playerGui = Player:FindFirstChildOfClass("PlayerGui")
+        or Player:FindFirstChild("PlayerGui")
+
+    local main = playerGui and playerGui:FindFirstChild("Main")
+    return main and main:FindFirstChild("Quest")
+end
+
+local function getQuestTitle()
+    local quest = getQuestGui()
+    if not quest then
+        return ""
+    end
+
+    local ok, result = pcall(function()
+        return quest.Container.QuestTitle.Title.Text
+    end)
+
+    if ok and type(result) == "string" then
+        return result
+    end
+
+    return ""
+end
+
+local function isQuestVisible()
+    local quest = getQuestGui()
+    return quest and quest.Visible == true
+end
+
+local function questMatches(q)
+    if not q then
+        return false
+    end
+
+    local title = string.lower(getQuestTitle())
+    local mob = string.lower(q.Mob)
+
+    return title ~= "" and string.find(title, mob, 1, true) ~= nil
+end
+
+local function tryTravelToSubmerged(level)
+    if level < 2600 then
+        return
+    end
+
+    local remotes = ReplicatedStorage:FindFirstChild("Remotes")
+    if not remotes then
+        return
+    end
+
+    local remote = remotes:FindFirstChild("RF/SubmarineWorkerSpeak")
+    if not remote then
+        return
+    end
+
+    pcall(function()
+        remote:InvokeServer("TravelToSubmergedIsland")
+    end)
+end
+
+local function getNearestEnemy(fromPosition, wantedName)
+    local enemies = workspace:FindFirstChild("Enemies")
+    if not enemies then
+        return nil
+    end
+
+    local wanted = wantedName and string.lower(wantedName) or nil
+    local nearest = nil
+    local nearestDistance = math.huge
+
+    for _, enemy in ipairs(enemies:GetChildren()) do
+        if enemy:IsA("Model") then
+            local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+            local root = enemy:FindFirstChild("HumanoidRootPart")
+                or enemy:FindFirstChild("Torso")
+
+            if humanoid and root and humanoid.Health > 0 then
+                local nameOK = true
+
+                if wanted then
+                    nameOK = string.find(
+                        string.lower(enemy.Name),
+                        wanted,
+                        1,
+                        true
+                    ) ~= nil
+                end
+
+                if nameOK then
+                    local distance = (root.Position - fromPosition).Magnitude
+
+                    if distance < nearestDistance then
+                        nearest = enemy
+                        nearestDistance = distance
+                    end
+                end
+            end
+        end
+    end
+
+    return nearest, nearestDistance
+end
+
+local function toolPriority(tool)
+    if not tool:IsA("Tool") then
+        return -1
+    end
+
+    local tip = string.lower(tostring(tool.ToolTip or ""))
+
+    if tip == "melee" or tip:find("melee", 1, true) then
+        return 300
+    end
+
+    if tip == "sword" or tip:find("sword", 1, true) then
+        return 200
+    end
+
+    return 100
+end
+
+local function findBestTool(character)
+    local equipped = character:FindFirstChildOfClass("Tool")
+    if equipped then
+        return equipped
+    end
+
+    local backpack = Player:FindFirstChildOfClass("Backpack")
+        or Player:FindFirstChild("Backpack")
+
+    if not backpack then
+        return nil
+    end
+
+    local bestTool = nil
+    local bestPriority = -1
+
+    for _, child in ipairs(backpack:GetChildren()) do
+        local priority = toolPriority(child)
+
+        if priority > bestPriority then
+            bestPriority = priority
+            bestTool = child
+        end
+    end
+
+    return bestTool
+end
+
+local function equipBestTool(character, humanoid)
+    local tool = findBestTool(character)
+
+    if tool and tool.Parent ~= character then
+        pcall(function()
+            humanoid:EquipTool(tool)
+        end)
+    end
+
+    if tool and tool.Parent == character then
+        return tool
+    end
+
+    return character:FindFirstChildOfClass("Tool")
+end
+
+--=========================================================
+-- ATTACK ENGINE V1.6 - MODERN BLOX FRUITS NET COMBAT
+--
+-- Không VirtualUser / VirtualInputManager.
+-- Không CombatFramework click.
+--
+-- Combat hiện tại:
+--   ReplicatedStorage.Modules.Net
+--      ["RE/RegisterAttack"]
+--      ["RE/RegisterHit"]
+--
+-- RegisterHit cần SessionID hợp lệ lấy từ SendHitsToServer.
+--=========================================================
+
+local NetAttack = {
+    Ready = false,
+    Error = nil,
+    Net = nil,
+    RegisterAttack = nil,
+    RegisterHit = nil,
+    LastAttack = 0,
+    Delay = 0.18,
+}
+
+local function getGlobalEnv()
+    if type(getrenv) == "function" then
+        local ok, env = pcall(getrenv)
+        if ok and type(env) == "table" then
+            return env
+        end
+    end
+    return _G
+end
+
+local function getUpvaluesCompat(fn)
+    if type(fn) ~= "function" then
+        return nil
+    end
+
+    if type(getupvalues) == "function" then
+        local ok, values = pcall(getupvalues, fn)
+        if ok and type(values) == "table" then
+            return values
+        end
+    end
+
+    if type(debug) == "table" and type(debug.getupvalues) == "function" then
+        local ok, values = pcall(debug.getupvalues, fn)
+        if ok and type(values) == "table" then
+            return values
+        end
+    end
+
+    return nil
+end
+
+local function initNetCombat()
+    if NetAttack.Ready then
+        return true
+    end
+
+    local modules = ReplicatedStorage:FindFirstChild("Modules")
+    local net = modules and modules:FindFirstChild("Net")
+    if not net then
+        NetAttack.Error = "NO_MODULES_NET"
+        return false
+    end
+
+    local registerAttack = net:FindFirstChild("RE/RegisterAttack")
+    local registerHit = net:FindFirstChild("RE/RegisterHit")
+
+    if not registerAttack then
+        NetAttack.Error = "NO_RE_REGISTER_ATTACK"
+        return false
+    end
+
+    if not registerHit then
+        NetAttack.Error = "NO_RE_REGISTER_HIT"
+        return false
+    end
+
+    NetAttack.Net = net
+    NetAttack.RegisterAttack = registerAttack
+    NetAttack.RegisterHit = registerHit
+    NetAttack.Ready = true
+    NetAttack.Error = nil
+    return true
+end
+
+local function getSessionID()
+    local env = getGlobalEnv()
+    local globalTable = env and rawget(env, "_G")
+
+    if type(globalTable) ~= "table" then
+        NetAttack.Error = "NO_RENV_GLOBAL"
+        return nil
+    end
+
+    local sendHits = rawget(globalTable, "SendHitsToServer")
+    if type(sendHits) ~= "function" then
+        NetAttack.Error = "NO_SEND_HITS_TO_SERVER"
+        return nil
+    end
+
+    local upvalues = getUpvaluesCompat(sendHits)
+    if not upvalues or upvalues[1] == nil then
+        NetAttack.Error = "NO_COMBAT_THREAD_UPVALUE"
+        return nil
+    end
+
+    local combatThread = upvalues[1]
+    local userIDString = tostring(Player.UserId)
+    local threadString = tostring(combatThread)
+
+    local userSlice = userIDString:sub(2, 4)
+    local memorySlice = threadString:sub(11, 15)
+
+    if userSlice == "" or memorySlice == "" then
+        NetAttack.Error = "SESSION_ID_BUILD_FAILED"
+        return nil
+    end
+
+    return userSlice .. memorySlice
+end
+
+local function getHitPart(enemy)
+    if not enemy or not enemy.Parent then
+        return nil
+    end
+
+    local names = {
+        "RightLowerLeg",
+        "LeftLowerLeg",
+        "RightLeg",
+        "LeftLeg",
+        "HumanoidRootPart",
+        "UpperTorso",
+        "Torso",
+        "Head",
+    }
+
+    for _, name in ipairs(names) do
+        local part = enemy:FindFirstChild(name)
+        if part and part:IsA("BasePart") then
+            return part
+        end
+    end
+
+    for _, obj in ipairs(enemy:GetDescendants()) do
+        if obj:IsA("BasePart") then
+            return obj
+        end
+    end
+
+    return nil
+end
+
+local function netCombatAttack(enemy)
+    if not enemy or not enemy.Parent then
+        return false, "NO_ENEMY"
+    end
+
+    if not initNetCombat() then
+        return false, NetAttack.Error or "NET_INIT_FAILED"
+    end
+
+    local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+    if not humanoid or humanoid.Health <= 0 then
+        return false, "ENEMY_DEAD"
+    end
+
+    local hitPart = getHitPart(enemy)
+    if not hitPart then
+        return false, "NO_HIT_PART"
+    end
+
+    local sessionID = getSessionID()
+    if not sessionID then
+        return false, NetAttack.Error or "NO_SESSION_ID"
+    end
+
+    local now = os.clock()
+    if now - NetAttack.LastAttack < NetAttack.Delay then
+        return false, "ATTACK_COOLDOWN"
+    end
+    NetAttack.LastAttack = now
+
+    local attackOK = pcall(function()
+        NetAttack.RegisterAttack:FireServer(0.5)
+    end)
+    if not attackOK then
+        NetAttack.Error = "REGISTER_ATTACK_FAILED"
+        return false, NetAttack.Error
+    end
+
+    task.wait()
+
+    local hitOK = pcall(function()
+        NetAttack.RegisterHit:FireServer(
+            hitPart,
+            {},
+            nil,
+            sessionID
+        )
+    end)
+
+    if not hitOK then
+        NetAttack.Error = "REGISTER_HIT_FAILED"
+        return false, NetAttack.Error
+    end
+
+    NetAttack.Error = nil
+    return true, "NET_REGISTER_HIT"
+end
+
+local function safeAttack(tool, targetRoot)
+    if not targetRoot or not targetRoot.Parent then
+        return false, "NO_TARGET"
+    end
+
+    local enemy = targetRoot.Parent
+    if not enemy or not enemy:IsA("Model") then
+        return false, "INVALID_TARGET_MODEL"
+    end
+
+    if not tool or not tool.Parent then
+        return false, "NO_TOOL"
+    end
+
+    return netCombatAttack(enemy)
+end
+
+local function moveToQuest(root, q)
+    if not root or not q then
+        return false
+    end
+
+    pcall(function()
+        root.AssemblyLinearVelocity = Vector3.zero
+        root.AssemblyAngularVelocity = Vector3.zero
+        root.CFrame = q.CFrame * CFrame.new(0, 2.5, 0)
+    end)
+
+    return (root.Position - q.CFrame.Position).Magnitude <= 20
+end
+
+local function requestQuest(q, root)
+    if not q or not root then
+        return false
+    end
+
+    if os.clock() - FarmState.LastQuestAttempt < FarmState.QuestRetryDelay then
+        return false
+    end
+
+    FarmState.LastQuestAttempt = os.clock()
+
+    local level = getPlayerLevel()
+    tryTravelToSubmerged(level)
+
+    moveToQuest(root, q)
+    task.wait(0.22)
+
+    local remote = getCommRemote()
+    if not remote then
+        return false
+    end
+
+    local ok = pcall(function()
+        remote:InvokeServer("StartQuest", q.Quest, q.Index)
+    end)
+
+    task.wait(0.28)
+
+    return ok
+end
+
+local function abandonQuest()
+    local remote = getCommRemote()
+    if not remote then
+        return
+    end
+
+    pcall(function()
+        remote:InvokeServer("AbandonQuest")
+    end)
+end
+
+--=========================================================
+-- FARM UI
+--=========================================================
+
+local FarmPanel = Instance.new("Frame")
+FarmPanel.Size = UDim2.new(1, -24, 0, 128)
+FarmPanel.Position = UDim2.new(0, 12, 0, 12)
+FarmPanel.BackgroundColor3 = Color3.fromRGB(28, 28, 34)
+FarmPanel.BorderSizePixel = 0
+FarmPanel.Parent = FarmPage
+
+local FarmPanelCorner = Instance.new("UICorner")
+FarmPanelCorner.CornerRadius = UDim.new(0, 9)
+FarmPanelCorner.Parent = FarmPanel
+
+local FarmTitle = Instance.new("TextLabel")
+FarmTitle.Size = UDim2.new(1, -24, 0, 28)
+FarmTitle.Position = UDim2.new(0, 12, 0, 8)
+FarmTitle.BackgroundTransparency = 1
+FarmTitle.Text = "Auto Farm Level + Quest"
+FarmTitle.TextColor3 = Color3.fromRGB(235, 235, 240)
+FarmTitle.TextSize = 15
+FarmTitle.Font = Enum.Font.GothamBold
+FarmTitle.TextXAlignment = Enum.TextXAlignment.Left
+FarmTitle.Parent = FarmPanel
+
+local FarmStatus = Instance.new("TextLabel")
+FarmStatus.Size = UDim2.new(1, -90, 0, 42)
+FarmStatus.Position = UDim2.new(0, 12, 0, 39)
+FarmStatus.BackgroundTransparency = 1
+FarmStatus.Text = "Trạng thái: Tắt"
+FarmStatus.TextColor3 = Color3.fromRGB(170, 170, 180)
+FarmStatus.TextSize = 12
+FarmStatus.Font = Enum.Font.Gotham
+FarmStatus.TextWrapped = true
+FarmStatus.TextXAlignment = Enum.TextXAlignment.Left
+FarmStatus.TextYAlignment = Enum.TextYAlignment.Top
+FarmStatus.Parent = FarmPanel
+
+local Toggle = Instance.new("TextButton")
+Toggle.Size = UDim2.new(0, 58, 0, 28)
+Toggle.Position = UDim2.new(1, -70, 0, 39)
+Toggle.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
+Toggle.Text = "OFF"
+Toggle.TextColor3 = Color3.fromRGB(245, 245, 245)
+Toggle.TextSize = 12
+Toggle.Font = Enum.Font.GothamBold
+Toggle.BorderSizePixel = 0
+Toggle.Parent = FarmPanel
+
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(1, 0)
+ToggleCorner.Parent = Toggle
+
+local FarmInfo = Instance.new("TextLabel")
+FarmInfo.Size = UDim2.new(1, -24, 0, 34)
+FarmInfo.Position = UDim2.new(0, 12, 0, 86)
+FarmInfo.BackgroundTransparency = 1
+FarmInfo.Text = "Tự nhận quest • Net Combat • đứng cao ~35 studs • không auto-click"
+FarmInfo.TextColor3 = Color3.fromRGB(135, 135, 145)
+FarmInfo.TextSize = 11
+FarmInfo.Font = Enum.Font.Gotham
+FarmInfo.TextWrapped = true
+FarmInfo.TextXAlignment = Enum.TextXAlignment.Left
+FarmInfo.Parent = FarmPanel
+
+local function updateToggleVisual()
+    Toggle.Text = FarmState.Enabled and "ON" or "OFF"
+
+    TweenService:Create(
+        Toggle,
+        TweenInfo.new(0.15),
+        {
+            BackgroundColor3 = FarmState.Enabled
+                and Color3.fromRGB(63, 122, 82)
+                or Color3.fromRGB(65, 65, 75)
+        }
+    ):Play()
+
+    if not FarmState.Enabled then
+        FarmStatus.Text = "Trạng thái: Tắt"
+    end
+end
+
+local function stopFarm()
+    FarmState.Enabled = false
+    FarmState.Token += 1
+    updateToggleVisual()
+end
+
+local function startFarm()
+    if FarmState.Enabled then
+        return
+    end
+
+    FarmState.Enabled = true
+    FarmState.Token += 1
+    FarmState.LastQuestAttempt = 0
+
+    local myToken = FarmState.Token
+    local lastAttack = 0
+
+    updateToggleVisual()
+
+    task.spawn(function()
+        while FarmState.Enabled
+            and FarmState.Token == myToken
+            and ScreenGui.Parent do
+
+            local character, humanoid, playerRoot = getCharacter()
+
+            if not character then
+                FarmStatus.Text = "Trạng thái: Đợi nhân vật..."
+                task.wait(0.25)
+                continue
+            end
+
+            local level = getPlayerLevel()
+            local q = resolveQuest(level)
+
+            if not q then
+                FarmStatus.Text = "Không có dữ liệu quest cho Lv." .. tostring(level)
+                task.wait(0.5)
+                continue
+            end
+
+            -- Không có quest: tự đi nhận.
+            if not isQuestVisible() then
+                FarmStatus.Text =
+                    "Nhận quest Lv." .. tostring(level) ..
+                    ": " .. q.Mob
+
+                requestQuest(q, playerRoot)
+                task.wait(0.15)
+                continue
+            end
+
+            -- Có quest nhưng sai mob: bỏ quest rồi lấy lại đúng quest.
+            if not questMatches(q) then
+                FarmStatus.Text = "Quest sai → đang nhận lại: " .. q.Mob
+                abandonQuest()
+                task.wait(0.35)
+                continue
+            end
+
+            local enemy = getNearestEnemy(playerRoot.Position, q.Mob)
+
+            if not enemy then
+                FarmStatus.Text =
+                    "Quest: " .. q.Mob ..
+                    " | Đợi mob spawn..."
+
+                task.wait(0.18)
+                continue
+            end
+
+            local enemyHumanoid = enemy:FindFirstChildOfClass("Humanoid")
+            local enemyRoot = enemy:FindFirstChild("HumanoidRootPart")
+                or enemy:FindFirstChild("Torso")
+
+            if not enemyHumanoid or not enemyRoot or enemyHumanoid.Health <= 0 then
+                task.wait(FarmState.UpdateDelay)
+                continue
+            end
+
+            -- Mở nhẹ hitbox để vẫn đánh được khi đứng cao hơn mob.
+            pcall(function()
+                enemyRoot.CanCollide = false
+
+                if enemyRoot.Size.X < 10 then
+                    enemyRoot.Size = Vector3.new(10, 10, 10)
+                end
+            end)
+
+            local targetCFrame =
+                enemyRoot.CFrame
+                * CFrame.new(
+                    0,
+                    FarmState.HoverHeight,
+                    FarmState.BackOffset
+                )
+
+            local farmPosition = targetCFrame.Position
+
+            targetCFrame = CFrame.lookAt(
+                farmPosition,
+                enemyRoot.Position
+            )
+
+            pcall(function()
+                playerRoot.AssemblyLinearVelocity = Vector3.zero
+                playerRoot.AssemblyAngularVelocity = Vector3.zero
+                playerRoot.CFrame = targetCFrame
+            end)
+
+            local tool = equipBestTool(character, humanoid)
+            local now = os.clock()
+
+            if tool and (now - lastAttack) >= FarmState.AttackDelay then
+                lastAttack = now
+                local ok, backend = safeAttack(tool, enemyRoot)
+
+                if ok then
+                    FarmStatus.Text =
+                        "Lv." .. tostring(level) ..
+                        " | " .. q.Mob ..
+                        " | " .. tostring(backend)
+                elseif backend ~= "ATTACK_COOLDOWN" then
+                    FarmStatus.Text =
+                        "Combat: " .. tostring(backend)
+                end
+            elseif not tool then
+                FarmStatus.Text = "Không tìm thấy Tool để đánh"
+            end
+
+            task.wait(FarmState.UpdateDelay)
+        end
+    end)
+end
+
+Toggle.MouseButton1Click:Connect(function()
+    if FarmState.Enabled then
+        stopFarm()
+    else
+        startFarm()
+    end
+end)
+
+ScreenGui.Destroying:Connect(function()
+    FarmState.Enabled = false
+    FarmState.Token += 1
+end)
+
+--=========================================================
+-- DRAG SYSTEM
+--=========================================================
+
+local dragging = false
+local dragStart
+local startPos
+
+TopBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+
+        dragging = true
+        dragStart = input.Position
+        startPos = Main.Position
+    end
+end)
+
+TopBar.InputChanged:Connect(function(input)
+    if dragging and (
+        input.UserInputType == Enum.UserInputType.MouseMovement
+        or input.UserInputType == Enum.UserInputType.Touch
+    ) then
+
+        local delta = input.Position - dragStart
+
+        Main.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+
+        dragging = false
+    end
+end)
+
+--=========================================================
+-- MINIMIZE SYSTEM
+--=========================================================
+
+local minimized = false
+local originalSize = Main.Size
+
+Minimize.MouseButton1Click:Connect(function()
+    minimized = not minimized
+
+    if minimized then
+        Sidebar.Visible = false
+        Content.Visible = false
+
+        TweenService:Create(
+            Main,
+            TweenInfo.new(0.2),
+            {Size = UDim2.new(0, 560, 0, 45)}
+        ):Play()
+    else
+        TweenService:Create(
+            Main,
+            TweenInfo.new(0.2),
+            {Size = originalSize}
+        ):Play()
+
+        task.delay(0.2, function()
+            Sidebar.Visible = true
+            Content.Visible = true
+        end)
+    end
+end)
+
+Close.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+print("[AXIOM] UI + Auto Farm Quest V1.6 NET COMBAT loaded.")
